@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.21
+# v0.12.20
 
 using Markdown
 using InteractiveUtils
@@ -83,7 +83,7 @@ begin
 end
 
 # ╔═╡ 768f9410-719c-11eb-31a7-8f26a5a7ee90
-N = 100;
+N = 200;
 
 # ╔═╡ 1018c09c-6f14-11eb-0e0e-a5e9a11b79f1
 lambda = 15;
@@ -118,14 +118,8 @@ Obj2y = slider_obj2y
 # ╔═╡ 0fe13ca8-6f14-11eb-0e61-1b30e672c399
 Refx = N*0.01
 
-# ╔═╡ 7d40d5a2-73e8-11eb-3fe2-3dea35e723d2
-all_obj_x = [Refx Obj2x Objx 10 5]
-
 # ╔═╡ 0ff2d2a6-6f14-11eb-3f6d-5b8c7529b543
 Refy = N*0.5
-
-# ╔═╡ 8e614b80-73e8-11eb-22d6-9fe17ad381e9
-all_obj_y = [Refy Obj2y Objy 90 70]
 
 # ╔═╡ 99073020-71b0-11eb-27b3-4b7ddb9f9836
 exposure_time = 10*lambda
@@ -157,7 +151,7 @@ end
 # ╔═╡ 8d96f660-7216-11eb-0390-955faee9d4ed
 function nonlinearity_film(input)
 	slope = 1000;
-	threshold = 1.95; 
+	threshold = 1.9; 
 	output = (tanh(slope*(input-threshold))+1)/2
 	return output
 end
@@ -192,57 +186,42 @@ function yderiv(x,y,Refx,Refy,Objx,Objy)
 	return yy
 end
 
-# ╔═╡ 7a541c82-71a4-11eb-196f-4f800ef78d2a
-function angle_bounce(x,y,Refx,Refy,Objx,Objy)
-	vec_in = [Refx-x, Refy-y]; 
-	xd = xderiv(x,y,Refx,Refy,Objx,Objy)
-	yd = yderiv(x,y,Refx,Refy,Objx,Objy)
-	vec_mirr = [xd,yd]/sqrt(xd^2+yd^2);
-	dot = vec_in[1]*vec_mirr[1]+vec_in[2]*vec_mirr[2]; 
-	vec_out = @. vec_in - 2*(dot)*vec_mirr; 
-	a = exposed_film(x,y,Refx,Refy,Objx,Objy)*atan(vec_out[2], vec_out[1])
+# ╔═╡ f1adace0-719c-11eb-3e32-21e76adffd1a
+function mirror_angle(x,y,Refx,Refy,Objx,Objy)
+	a = atan(yderiv(x,y,Refx,Refy,Objx,Objy), xderiv(x,y,Refx,Refy,Objx,Objy))
 	return a
 end
 
-# ╔═╡ 16f5bdf0-73e9-11eb-0393-af94875171c8
-1:1
+# ╔═╡ beed4202-71a3-11eb-1036-6b15fbede333
+function angle_to_ref(x,y,Refx,Refy)
+	a = atan((Refy-y),Refx-x);
+	return a
+end
 
-# ╔═╡ 62268ae0-73b5-11eb-0285-bd6ee6756732
+# ╔═╡ 7a541c82-71a4-11eb-196f-4f800ef78d2a
+function angle_bounce(x,y,Refx,Refy,Objx,Objy)
+	a = exposed_film(x,y,Refx,Refy,Objx,Objy)*(mod(2*mirror_angle(x,y,Refx,Refy,Objx,Objy)-angle_to_ref(x,y,Refx,Refy)+pi,2*pi)-pi)
+	return a
+end
+
+# ╔═╡ c0344e70-7247-11eb-3e52-770f698330f0
 begin
 	angle_full = zeros(N,N)
 	for i in xids
 		for j in yids
-			for ob1 in 2:size(all_obj_x)[2]
-				for ob2 in 1:(ob1-1)
-					angle_full[i,j] = angle_full[i,j] + angle_bounce(i,j, all_obj_x[ob2],all_obj_y[ob2],all_obj_x[ob1],all_obj_y[ob1]);
-				end
-			end
+			angle_full[i,j] = angle_bounce(i,j,Refx,Refy,Objx,Objy) + angle_bounce(i,j,Refx,Refy,Obj2x,Obj2y) + angle_bounce(i,j,Objx,Objy,Obj2x,Obj2y);
 		end
 	end
 end
 
-# ╔═╡ f7722800-73e9-11eb-19c0-e9d01223797f
-begin
-	exposed_full = zeros(N,N)
-	for i in xids
-		for j in yids
-			for ob1 in 2:size(all_obj_x)[2]
-				for ob2 in 1:(ob1-1)
-					exposed_full[i,j] = exposed_full[i,j] + exposed_film(i,j, all_obj_x[ob2],all_obj_y[ob2],all_obj_x[ob1],all_obj_y[ob1]);
-				end
-			end
-		end
-	end
-end
+# ╔═╡ b9184ab0-724c-11eb-1f42-8b01a46926b4
+exposed_full = @. exposed_film(X,Y,Refx,Refy,Objx,Objy)+exposed_film(X,Y,Refx,Refy,Obj2x,Obj2y)+exposed_film(X,Y,Objx,Objy,Obj2x,Obj2y);
 
 # ╔═╡ 26e7c5e0-723c-11eb-064d-0d684391b253
 md"## Visualizations"
 
 # ╔═╡ 64d22c20-72b3-11eb-2cea-e9449721dca7
 #draw_points!(draw_all_lines!(heatmap(angle_full')))
-
-# ╔═╡ 7b0bf770-73ec-11eb-293a-b321fd7bdb3b
-alpha_lines = .1; 
 
 # ╔═╡ 24760c60-71a9-11eb-0a93-a33521a183b4
 function draw_lines_bounce!(plt,xids,yids)
@@ -251,7 +230,7 @@ function draw_lines_bounce!(plt,xids,yids)
 		for j in yids
 			if exposed_full[i,j]>=thres
 				fxline = x -> (x-i)*tan(angle_full[i,j]) + j;
-				plot!(plt,fxline,1,N; label=false, color=:white, alpha=alpha_lines, xlims=[0,N], ylims=[0,N])
+				plot!(plt,fxline,1,N; label=false, color=:white, alpha=0.1, xlims=[0,N], ylims=[0,N])
 			end
 		end
 	end
@@ -264,8 +243,8 @@ function draw_lines_ref!(plt,xids,yids)
 	for i in xids
 		for j in yids
 			if exposed_full[i,j]>=thres
-				fxline = x -> (x-i)*(Refy-j)/(Refx-i) + j;
-				plot!(plt,fxline,Refx,i; label=false, color=:white, alpha=alpha_lines, xlims=[0,N], ylims=[0,N])
+				fxline = x -> (x-i)*tan(angle_to_ref(i,j,Refx,Refy)) + j;
+				plot!(plt,fxline,Refx,i; label=false, color=:white, alpha=0.1, xlims=[0,N], ylims=[0,N])
 			end
 		end
 	end
@@ -280,12 +259,14 @@ end
 
 # ╔═╡ ee9c7010-71ae-11eb-37ad-e345c1cecf9c
 function draw_points!(plt)
-	scatter!(plt, all_obj_x,all_obj_y;label=false, markeralpha=0, markerstrokealpha=1, markersize=10, markerstrokecolor=:gray)
+	scatter!(plt, [Refx],[Refy];label=false)
+	scatter!(plt, [Objx],[Objy];label=false)
+	scatter!(plt, [Obj2x],[Obj2y];label=false)
 	return plt
 end
 
 # ╔═╡ 00049980-7200-11eb-1b02-f9e9b698bdc0
-draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
+draw_points!(draw_all_lines!(heatmap(angle_full',aspect_ratio=:equal)))
 
 # ╔═╡ e95f29b0-71fb-11eb-1bab-2d693bf71a5e
 plot(nonlinearity_film,-1,2)
@@ -317,8 +298,6 @@ pyplot();
 # ╠═768f9410-719c-11eb-31a7-8f26a5a7ee90
 # ╠═1018c09c-6f14-11eb-0e0e-a5e9a11b79f1
 # ╠═69cdb220-72b4-11eb-11b2-af93cd66d67a
-# ╠═7d40d5a2-73e8-11eb-3fe2-3dea35e723d2
-# ╠═8e614b80-73e8-11eb-22d6-9fe17ad381e9
 # ╟─1017d4a2-6f14-11eb-29c6-e95b223ad504
 # ╟─793f1450-71f7-11eb-33c6-5be3a4f0e071
 # ╟─10044e00-6f14-11eb-2dcc-439b1f24a301
@@ -342,14 +321,14 @@ pyplot();
 # ╠═23690f90-71b1-11eb-08bd-717befedca10
 # ╠═683648f0-71a6-11eb-33a4-5b4e20bde543
 # ╠═190e8070-71a7-11eb-23e1-aff3e245e798
+# ╠═f1adace0-719c-11eb-3e32-21e76adffd1a
+# ╠═beed4202-71a3-11eb-1036-6b15fbede333
 # ╠═7a541c82-71a4-11eb-196f-4f800ef78d2a
-# ╠═16f5bdf0-73e9-11eb-0393-af94875171c8
-# ╠═62268ae0-73b5-11eb-0285-bd6ee6756732
-# ╠═f7722800-73e9-11eb-19c0-e9d01223797f
+# ╠═c0344e70-7247-11eb-3e52-770f698330f0
+# ╠═b9184ab0-724c-11eb-1f42-8b01a46926b4
 # ╟─26e7c5e0-723c-11eb-064d-0d684391b253
 # ╠═64d22c20-72b3-11eb-2cea-e9449721dca7
 # ╠═fe8b2470-71f5-11eb-0272-c11c0db72115
-# ╠═7b0bf770-73ec-11eb-293a-b321fd7bdb3b
 # ╠═24760c60-71a9-11eb-0a93-a33521a183b4
 # ╠═a4ac65e0-71f5-11eb-1c64-df5c124606f3
 # ╠═ee9c7010-71ae-11eb-37ad-e345c1cecf9c
