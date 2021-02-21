@@ -1,7 +1,7 @@
 module Hologram
 
-#greet() = print("Hello World!")
-
 include("holo.jl")
+include("notebook.jl")
+include("fastplots.jl")
 
 end # module
