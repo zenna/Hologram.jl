@@ -28,6 +28,30 @@ using PlutoUI
 # ╔═╡ 88617f5e-723b-11eb-31b3-8b338783405a
 md"# Hologram simulation"
 
+# ╔═╡ 9c416360-723b-11eb-2cb3-216d0e5d9f58
+md"## Setting up packages"
+
+# ╔═╡ 0e8c8dc0-724e-11eb-1df1-275b15dd6de2
+import Pkg; Pkg.add("PlutoUI")
+
+# ╔═╡ 5a591402-71a2-11eb-26d5-efb118020d5a
+pyplot();
+
+# ╔═╡ 26e7c5e0-723c-11eb-064d-0d684391b253
+md"## Visualizations"
+
+# ╔═╡ 64d22c20-72b3-11eb-2cea-e9449721dca7
+#draw_points!(draw_all_lines!(heatmap(angle_full')))
+
+# ╔═╡ 7b0bf770-73ec-11eb-293a-b321fd7bdb3b
+alpha_lines = .1; 
+
+# ╔═╡ 3823f562-7221-11eb-294e-254c9aa608b7
+#heatmap(@. interference_pattern(X,Y,Refx,Refy,Objx,Objy)')
+
+# ╔═╡ d4176030-721a-11eb-0cd0-0f63f3387541
+#heatmap(angle_bounce')
+
 # ╔═╡ ae4cae70-723b-11eb-162d-7dce1c0181de
 md"## Parameters and basic variables"
 
@@ -127,6 +151,12 @@ Refy = N*0.5
 # ╔═╡ 8e614b80-73e8-11eb-22d6-9fe17ad381e9
 all_obj_y = [Refy Obj2y Objy 90 70]
 
+# ╔═╡ ee9c7010-71ae-11eb-37ad-e345c1cecf9c
+function draw_points!(plt)
+	scatter!(plt, all_obj_x,all_obj_y;label=false, markeralpha=0, markerstrokealpha=1, markersize=10, markerstrokecolor=:gray)
+	return plt
+end
+
 # ╔═╡ 99073020-71b0-11eb-27b3-4b7ddb9f9836
 exposure_time = 10*lambda
 
@@ -161,6 +191,9 @@ function nonlinearity_film(input)
 	output = (tanh(slope*(input-threshold))+1)/2
 	return output
 end
+
+# ╔═╡ e95f29b0-71fb-11eb-1bab-2d693bf71a5e
+plot(nonlinearity_film,-1,2)
 
 # ╔═╡ f7c4d79e-7243-11eb-2140-438d9e685896
 function interference_pattern(x, y,Refx,Refy,Objx,Objy)
@@ -235,15 +268,6 @@ begin
 	end
 end
 
-# ╔═╡ 26e7c5e0-723c-11eb-064d-0d684391b253
-md"## Visualizations"
-
-# ╔═╡ 64d22c20-72b3-11eb-2cea-e9449721dca7
-#draw_points!(draw_all_lines!(heatmap(angle_full')))
-
-# ╔═╡ 7b0bf770-73ec-11eb-293a-b321fd7bdb3b
-alpha_lines = .1; 
-
 # ╔═╡ 24760c60-71a9-11eb-0a93-a33521a183b4
 function draw_lines_bounce!(plt,xids,yids)
 	thres = .9
@@ -278,39 +302,29 @@ function draw_all_lines!(plt)
 	return(plt)
 end
 
-# ╔═╡ ee9c7010-71ae-11eb-37ad-e345c1cecf9c
-function draw_points!(plt)
-	scatter!(plt, all_obj_x,all_obj_y;label=false, markeralpha=0, markerstrokealpha=1, markersize=10, markerstrokecolor=:gray)
-	return plt
-end
-
 # ╔═╡ 00049980-7200-11eb-1b02-f9e9b698bdc0
 draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
 
-# ╔═╡ e95f29b0-71fb-11eb-1bab-2d693bf71a5e
-plot(nonlinearity_film,-1,2)
-
-# ╔═╡ 3823f562-7221-11eb-294e-254c9aa608b7
-#heatmap(@. interference_pattern(X,Y,Refx,Refy,Objx,Objy)')
-
-# ╔═╡ d4176030-721a-11eb-0cd0-0f63f3387541
-#heatmap(angle_bounce')
-
-# ╔═╡ 9c416360-723b-11eb-2cb3-216d0e5d9f58
-md"## Setting up packages"
-
-# ╔═╡ 0e8c8dc0-724e-11eb-1df1-275b15dd6de2
-import Pkg; Pkg.add("PlutoUI")
-
-# ╔═╡ 13a6b4c0-724e-11eb-200b-4f794ccff8f2
-
-
-# ╔═╡ 5a591402-71a2-11eb-26d5-efb118020d5a
-pyplot();
-
 # ╔═╡ Cell order:
 # ╟─88617f5e-723b-11eb-31b3-8b338783405a
+# ╟─9c416360-723b-11eb-2cb3-216d0e5d9f58
+# ╠═dbc31590-6f13-11eb-0349-15d2522d8223
+# ╠═f2706810-6f13-11eb-1a39-fb262ab776a4
+# ╠═45f9e8e4-6f14-11eb-3104-a35164c14580
+# ╠═0ade04b0-724e-11eb-2174-bb66b019de00
+# ╠═0e8c8dc0-724e-11eb-1df1-275b15dd6de2
+# ╠═5a591402-71a2-11eb-26d5-efb118020d5a
+# ╟─26e7c5e0-723c-11eb-064d-0d684391b253
 # ╠═00049980-7200-11eb-1b02-f9e9b698bdc0
+# ╠═64d22c20-72b3-11eb-2cea-e9449721dca7
+# ╠═fe8b2470-71f5-11eb-0272-c11c0db72115
+# ╠═7b0bf770-73ec-11eb-293a-b321fd7bdb3b
+# ╠═24760c60-71a9-11eb-0a93-a33521a183b4
+# ╠═a4ac65e0-71f5-11eb-1c64-df5c124606f3
+# ╠═ee9c7010-71ae-11eb-37ad-e345c1cecf9c
+# ╠═e95f29b0-71fb-11eb-1bab-2d693bf71a5e
+# ╠═3823f562-7221-11eb-294e-254c9aa608b7
+# ╠═d4176030-721a-11eb-0cd0-0f63f3387541
 # ╟─ae4cae70-723b-11eb-162d-7dce1c0181de
 # ╟─67402640-72b0-11eb-2488-2d9c4e3c5cea
 # ╟─dc30ac40-72b0-11eb-04cc-7d8f12718937
@@ -346,21 +360,3 @@ pyplot();
 # ╠═16f5bdf0-73e9-11eb-0393-af94875171c8
 # ╠═62268ae0-73b5-11eb-0285-bd6ee6756732
 # ╠═f7722800-73e9-11eb-19c0-e9d01223797f
-# ╟─26e7c5e0-723c-11eb-064d-0d684391b253
-# ╠═64d22c20-72b3-11eb-2cea-e9449721dca7
-# ╠═fe8b2470-71f5-11eb-0272-c11c0db72115
-# ╠═7b0bf770-73ec-11eb-293a-b321fd7bdb3b
-# ╠═24760c60-71a9-11eb-0a93-a33521a183b4
-# ╠═a4ac65e0-71f5-11eb-1c64-df5c124606f3
-# ╠═ee9c7010-71ae-11eb-37ad-e345c1cecf9c
-# ╠═e95f29b0-71fb-11eb-1bab-2d693bf71a5e
-# ╠═3823f562-7221-11eb-294e-254c9aa608b7
-# ╠═d4176030-721a-11eb-0cd0-0f63f3387541
-# ╟─9c416360-723b-11eb-2cb3-216d0e5d9f58
-# ╠═dbc31590-6f13-11eb-0349-15d2522d8223
-# ╠═f2706810-6f13-11eb-1a39-fb262ab776a4
-# ╠═45f9e8e4-6f14-11eb-3104-a35164c14580
-# ╠═0ade04b0-724e-11eb-2174-bb66b019de00
-# ╠═0e8c8dc0-724e-11eb-1df1-275b15dd6de2
-# ╠═13a6b4c0-724e-11eb-200b-4f794ccff8f2
-# ╠═5a591402-71a2-11eb-26d5-efb118020d5a
