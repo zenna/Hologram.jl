@@ -96,7 +96,7 @@ onmove({layerX: 30, layerY: 60})
 
 # ╔═╡ dc30ac40-72b0-11eb-04cc-7d8f12718937
 begin
-	dims = draw_dims
+	dims = [40 70 10 20]#draw_dims
 	xdims = sort(dims[1:2]);
 	ydims = sort(dims[3:4]); 
 	dims[1] = xdims[1];
@@ -113,7 +113,7 @@ N = 100;
 lambda = 15;
 
 # ╔═╡ 69cdb220-72b4-11eb-11b2-af93cd66d67a
-sort(draw_dims)
+#sort(draw_dims)
 
 # ╔═╡ 793f1450-71f7-11eb-33c6-5be3a4f0e071
 @bind slider_objy Slider(1:N, default=.9*N)
@@ -237,9 +237,6 @@ function angle_bounce(x,y,Refx,Refy,Objx,Objy)
 	return a
 end
 
-# ╔═╡ 16f5bdf0-73e9-11eb-0393-af94875171c8
-1:1
-
 # ╔═╡ 62268ae0-73b5-11eb-0285-bd6ee6756732
 begin
 	angle_full = zeros(N,N)
@@ -357,6 +354,5 @@ draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
 # ╠═683648f0-71a6-11eb-33a4-5b4e20bde543
 # ╠═190e8070-71a7-11eb-23e1-aff3e245e798
 # ╠═7a541c82-71a4-11eb-196f-4f800ef78d2a
-# ╠═16f5bdf0-73e9-11eb-0393-af94875171c8
 # ╠═62268ae0-73b5-11eb-0285-bd6ee6756732
 # ╠═f7722800-73e9-11eb-19c0-e9d01223797f
