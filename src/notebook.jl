@@ -31,11 +31,8 @@ md"# Hologram simulation"
 # ╔═╡ 9c416360-723b-11eb-2cb3-216d0e5d9f58
 md"## Setting up packages"
 
-# ╔═╡ 0e8c8dc0-724e-11eb-1df1-275b15dd6de2
-import Pkg; Pkg.add("PlutoUI")
-
-# ╔═╡ 5a591402-71a2-11eb-26d5-efb118020d5a
-pyplot();
+# ╔═╡ 6dc30e00-74be-11eb-3480-2104d2611575
+pyplot()
 
 # ╔═╡ 26e7c5e0-723c-11eb-064d-0d684391b253
 md"## Visualizations"
@@ -44,7 +41,7 @@ md"## Visualizations"
 #draw_points!(draw_all_lines!(heatmap(angle_full')))
 
 # ╔═╡ 7b0bf770-73ec-11eb-293a-b321fd7bdb3b
-alpha_lines = .1; 
+alpha_lines = .05; 
 
 # ╔═╡ 3823f562-7221-11eb-294e-254c9aa608b7
 #heatmap(@. interference_pattern(X,Y,Refx,Refy,Objx,Objy)')
@@ -106,6 +103,52 @@ begin
 	dims
 end
 
+# ╔═╡ 4fd22c60-74c7-11eb-2123-2949ac8c7a3a
+begin
+	@bind html_out html"""
+<canvas width="100" height="100" style="position: relative"></canvas>
+
+<script>
+// 🐸 `currentScript` is the current script tag - we use it to select elements 🐸 //
+const canvas = currentScript.closest('pluto-output').querySelector("canvas")
+const ctx = canvas.getContext("2d")
+
+var startX = 0
+var startY = 50
+	var old = []
+
+function onmove(e){
+	// 🐸 We send the value back to Julia 🐸 //
+	canvas.value = old.concat([startX, startY]) //e.layerX - startX, e.layerY - startY]
+	old = canvas.value
+	canvas.dispatchEvent(new CustomEvent("input"))
+
+	ctx.fillStyle = '#ffecec'
+	ctx.fillRect(0, 0, 100, 100)
+	ctx.fillStyle = '#3f3d6d'
+	ctx.fillRect(startX, startY, ...[3,3])
+}
+
+canvas.onmousedown = e => {
+	startX = e.layerX
+	startY = e.layerY
+	canvas.onmouseup = onmove
+}
+
+canvas.onmouseup = e => {
+	canvas.onmousemove = null
+}
+
+// Fire a fake mousemoveevent to show something
+onmove({layerX: 30, layerY: 60})
+
+</script>
+"""
+end
+
+# ╔═╡ eaa3ab70-74cb-11eb-2d02-4d7b0e8bb5ee
+num_pts = convert(Int64, round(length(html_out)/2, digits=0))
+
 # ╔═╡ 768f9410-719c-11eb-31a7-8f26a5a7ee90
 N = 100;
 
@@ -143,13 +186,23 @@ Obj2y = slider_obj2y
 Refx = N*0.01
 
 # ╔═╡ 7d40d5a2-73e8-11eb-3fe2-3dea35e723d2
-all_obj_x = [Refx Obj2x Objx 10 5]
+begin
+	all_obj_x = Refx
+	for i in 2:num_pts
+		all_obj_x = [all_obj_x html_out[convert(Int64, round(i*2-1, digits=0))] ]
+	end
+end
 
 # ╔═╡ 0ff2d2a6-6f14-11eb-3f6d-5b8c7529b543
 Refy = N*0.5
 
 # ╔═╡ 8e614b80-73e8-11eb-22d6-9fe17ad381e9
-all_obj_y = [Refy Obj2y Objy 90 70]
+begin
+	all_obj_y = Refy
+	for i in 2:num_pts
+		all_obj_y = [all_obj_y 100-html_out[convert(Int64, round(i*2, digits=0))] ]
+	end
+end
 
 # ╔═╡ ee9c7010-71ae-11eb-37ad-e345c1cecf9c
 function draw_points!(plt)
@@ -187,7 +240,7 @@ end
 # ╔═╡ 8d96f660-7216-11eb-0390-955faee9d4ed
 function nonlinearity_film(input)
 	slope = 1000;
-	threshold = 1.95; 
+	threshold = 1.99; 
 	output = (tanh(slope*(input-threshold))+1)/2
 	return output
 end
@@ -303,7 +356,7 @@ function draw_all_lines!(plt)
 end
 
 # ╔═╡ 00049980-7200-11eb-1b02-f9e9b698bdc0
-draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
+fig = draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
 
 # ╔═╡ Cell order:
 # ╟─88617f5e-723b-11eb-31b3-8b338783405a
@@ -311,9 +364,8 @@ draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
 # ╠═dbc31590-6f13-11eb-0349-15d2522d8223
 # ╠═f2706810-6f13-11eb-1a39-fb262ab776a4
 # ╠═45f9e8e4-6f14-11eb-3104-a35164c14580
+# ╠═6dc30e00-74be-11eb-3480-2104d2611575
 # ╠═0ade04b0-724e-11eb-2174-bb66b019de00
-# ╠═0e8c8dc0-724e-11eb-1df1-275b15dd6de2
-# ╠═5a591402-71a2-11eb-26d5-efb118020d5a
 # ╟─26e7c5e0-723c-11eb-064d-0d684391b253
 # ╠═00049980-7200-11eb-1b02-f9e9b698bdc0
 # ╠═64d22c20-72b3-11eb-2cea-e9449721dca7
@@ -328,11 +380,13 @@ draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
 # ╟─ae4cae70-723b-11eb-162d-7dce1c0181de
 # ╟─67402640-72b0-11eb-2488-2d9c4e3c5cea
 # ╟─dc30ac40-72b0-11eb-04cc-7d8f12718937
+# ╠═4fd22c60-74c7-11eb-2123-2949ac8c7a3a
+# ╠═eaa3ab70-74cb-11eb-2d02-4d7b0e8bb5ee
+# ╠═7d40d5a2-73e8-11eb-3fe2-3dea35e723d2
+# ╠═8e614b80-73e8-11eb-22d6-9fe17ad381e9
 # ╠═768f9410-719c-11eb-31a7-8f26a5a7ee90
 # ╠═1018c09c-6f14-11eb-0e0e-a5e9a11b79f1
 # ╠═69cdb220-72b4-11eb-11b2-af93cd66d67a
-# ╠═7d40d5a2-73e8-11eb-3fe2-3dea35e723d2
-# ╠═8e614b80-73e8-11eb-22d6-9fe17ad381e9
 # ╟─1017d4a2-6f14-11eb-29c6-e95b223ad504
 # ╟─793f1450-71f7-11eb-33c6-5be3a4f0e071
 # ╟─10044e00-6f14-11eb-2dcc-439b1f24a301
