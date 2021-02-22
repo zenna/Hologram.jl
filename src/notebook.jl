@@ -158,30 +158,6 @@ lambda = 15;
 # ╔═╡ 69cdb220-72b4-11eb-11b2-af93cd66d67a
 sort(draw_dims)
 
-# ╔═╡ 793f1450-71f7-11eb-33c6-5be3a4f0e071
-@bind slider_objy Slider(1:N, default=.9*N)
-
-# ╔═╡ 1017d4a2-6f14-11eb-29c6-e95b223ad504
-Objy = slider_objy
-
-# ╔═╡ 36076dce-72ac-11eb-2918-81b4f7f67bc7
-@bind slider_objx Slider(1:N, default=.9*N)
-
-# ╔═╡ 10044e00-6f14-11eb-2dcc-439b1f24a301
-Objx = slider_objx
-
-# ╔═╡ 004c1840-724c-11eb-2028-13dfb3eb82b0
-@bind slider_obj2x Slider(1:N, default=.8*N)
-
-# ╔═╡ be0879e0-72ac-11eb-30f8-2b111e90b758
-Obj2x = slider_obj2x
-
-# ╔═╡ 36e17bc0-724c-11eb-3dae-c38f863452b6
-@bind slider_obj2y Slider(1:N, default=.1*N)
-
-# ╔═╡ e82d0ce0-72ac-11eb-085c-39c65cb6879f
-Obj2y = slider_obj2y
-
 # ╔═╡ 0fe13ca8-6f14-11eb-0e61-1b30e672c399
 Refx = N*0.01
 
@@ -387,14 +363,6 @@ fig = draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
 # ╠═768f9410-719c-11eb-31a7-8f26a5a7ee90
 # ╠═1018c09c-6f14-11eb-0e0e-a5e9a11b79f1
 # ╠═69cdb220-72b4-11eb-11b2-af93cd66d67a
-# ╟─1017d4a2-6f14-11eb-29c6-e95b223ad504
-# ╟─793f1450-71f7-11eb-33c6-5be3a4f0e071
-# ╟─10044e00-6f14-11eb-2dcc-439b1f24a301
-# ╟─36076dce-72ac-11eb-2918-81b4f7f67bc7
-# ╟─be0879e0-72ac-11eb-30f8-2b111e90b758
-# ╟─004c1840-724c-11eb-2028-13dfb3eb82b0
-# ╟─e82d0ce0-72ac-11eb-085c-39c65cb6879f
-# ╟─36e17bc0-724c-11eb-3dae-c38f863452b6
 # ╟─0fe13ca8-6f14-11eb-0e61-1b30e672c399
 # ╟─0ff2d2a6-6f14-11eb-3f6d-5b8c7529b543
 # ╟─99073020-71b0-11eb-27b3-4b7ddb9f9836
