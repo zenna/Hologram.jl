@@ -115,6 +115,7 @@ const ctx = canvas.getContext("2d")
 
 var startX = 0
 var startY = 50
+<<<<<<< HEAD:src/notebook_click_pts.jl.backup2
 var old = []
 
 # ╔═╡ 69cdb220-72b4-11eb-11b2-af93cd66d67a
@@ -148,6 +149,10 @@ onmove({layerX: 30, layerY: 60})
 </script>
 """
 end
+=======
+	var old = []
+======
+>>>>>>> 901cc219b7127c3e964a9b60c448f84cb0497a55:src/notebook_click_pts.jl
 
 # ╔═╡ eaa3ab70-74cb-11eb-2d02-4d7b0e8bb5ee
 num_pts = convert(Int64, round(length(html_out)/2, digits=0))
