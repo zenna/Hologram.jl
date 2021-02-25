@@ -38,10 +38,19 @@ pyplot()
 md"## Visualizations"
 
 # ╔═╡ 64d22c20-72b3-11eb-2cea-e9449721dca7
-#draw_points!(draw_all_lines!(heatmap(angle_full')))
+#draw_points!(heatmap(@. interference_pattern(X,Y,Refx,Refy, all_obj_x[2], all_obj_y[2])'))
+
+# ╔═╡ 83588e70-7775-11eb-2a3f-011976e6521b
+#draw_points!(heatmap(@. exposed_film(X,Y,Refx,Refy, all_obj_x[2], all_obj_y[2])'))
+
+# ╔═╡ 8990cfa2-7775-11eb-27e9-bb316f58be46
+#draw_points!(heatmap(@. angle_bounce(X,Y,Refx,Refy, all_obj_x[2], all_obj_y[2])'))
 
 # ╔═╡ 7b0bf770-73ec-11eb-293a-b321fd7bdb3b
 alpha_lines = .05; 
+
+# ╔═╡ e95f29b0-71fb-11eb-1bab-2d693bf71a5e
+#plot(nonlinearity_film,-1,2)
 
 # ╔═╡ 3823f562-7221-11eb-294e-254c9aa608b7
 #heatmap(@. interference_pattern(X,Y,Refx,Refy,Objx,Objy)')
@@ -61,8 +70,8 @@ md"## Parameters and basic variables"
 const canvas = currentScript.closest('pluto-output').querySelector("canvas")
 const ctx = canvas.getContext("2d")
 
-var startX = 40
-var startY = 20
+var startX = 30
+var startY = 80
 
 function onmove(e){
 	// 🐸 We send the value back to Julia 🐸 //
@@ -86,14 +95,14 @@ canvas.onmouseup = e => {
 }
 
 // Fire a fake mousemoveevent to show something
-onmove({layerX: 30, layerY: 60})
+onmove({layerX: 70, layerY: 70})
 
 </script>
 """
 
 # ╔═╡ dc30ac40-72b0-11eb-04cc-7d8f12718937
 begin
-	dims = [40 70 10 20]#draw_dims
+	dims = draw_dims
 	xdims = sort(dims[1:2]);
 	ydims = sort(dims[3:4]); 
 	dims[1] = xdims[1];
@@ -116,11 +125,8 @@ const ctx = canvas.getContext("2d")
 var startX = 0
 var startY = 50
 var old = []
-
-# ╔═╡ 69cdb220-72b4-11eb-11b2-af93cd66d67a
-#sort(draw_dims)
-
-function onmove(e){
+	
+	function onmove(e){
 	// 🐸 We send the value back to Julia 🐸 //
 	canvas.value = old.concat([startX, startY]) //e.layerX - startX, e.layerY - startY]
 	old = canvas.value
@@ -166,9 +172,11 @@ Refx = N*0.01
 
 # ╔═╡ 7d40d5a2-73e8-11eb-3fe2-3dea35e723d2
 begin
-	all_obj_x = Refx
+	all_obj_x = zeros(1,max(num_pts,2))
+	all_obj_x[1] = Refx
+	all_obj_x[2] = 70
 	for i in 2:num_pts
-		all_obj_x = [all_obj_x html_out[convert(Int64, round(i*2-1, digits=0))] ]
+		all_obj_x[i] = html_out[convert(Int64, round(i*2-1, digits=0))] 
 	end
 end
 
@@ -177,9 +185,11 @@ Refy = N*0.5
 
 # ╔═╡ 8e614b80-73e8-11eb-22d6-9fe17ad381e9
 begin
-	all_obj_y = Refy
+	all_obj_y = zeros(1,max(num_pts,2))
+	all_obj_y[1] = Refy
+	all_obj_y[2] = 70
 	for i in 2:num_pts
-		all_obj_y = [all_obj_y 100-html_out[convert(Int64, round(i*2, digits=0))] ]
+		all_obj_y[i] = 100-html_out[convert(Int64, round(i*2, digits=0))] 
 	end
 end
 
@@ -188,6 +198,9 @@ function draw_points!(plt)
 	scatter!(plt, all_obj_x,all_obj_y;label=false, markeralpha=0, markerstrokealpha=1, markersize=10, markerstrokecolor=:gray)
 	return plt
 end
+
+# ╔═╡ 8b26f570-7774-11eb-1688-358a12996421
+all_obj_y
 
 # ╔═╡ 99073020-71b0-11eb-27b3-4b7ddb9f9836
 exposure_time = 10*lambda
@@ -219,13 +232,10 @@ end
 # ╔═╡ 8d96f660-7216-11eb-0390-955faee9d4ed
 function nonlinearity_film(input)
 	slope = 1000;
-	threshold = 1.99; 
+	threshold = 1.95; 
 	output = (tanh(slope*(input-threshold))+1)/2
 	return output
 end
-
-# ╔═╡ e95f29b0-71fb-11eb-1bab-2d693bf71a5e
-plot(nonlinearity_film,-1,2)
 
 # ╔═╡ f7c4d79e-7243-11eb-2140-438d9e685896
 function interference_pattern(x, y,Refx,Refy,Objx,Objy)
@@ -332,7 +342,7 @@ function draw_all_lines!(plt)
 end
 
 # ╔═╡ 00049980-7200-11eb-1b02-f9e9b698bdc0
-fig = draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
+draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
 
 # ╔═╡ Cell order:
 # ╟─88617f5e-723b-11eb-31b3-8b338783405a
@@ -345,6 +355,8 @@ fig = draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
 # ╟─26e7c5e0-723c-11eb-064d-0d684391b253
 # ╠═00049980-7200-11eb-1b02-f9e9b698bdc0
 # ╠═64d22c20-72b3-11eb-2cea-e9449721dca7
+# ╠═83588e70-7775-11eb-2a3f-011976e6521b
+# ╠═8990cfa2-7775-11eb-27e9-bb316f58be46
 # ╠═fe8b2470-71f5-11eb-0272-c11c0db72115
 # ╠═7b0bf770-73ec-11eb-293a-b321fd7bdb3b
 # ╠═24760c60-71a9-11eb-0a93-a33521a183b4
@@ -360,6 +372,7 @@ fig = draw_points!(draw_all_lines!(heatmap(@. mod(angle_full',2*pi))))
 # ╠═eaa3ab70-74cb-11eb-2d02-4d7b0e8bb5ee
 # ╠═7d40d5a2-73e8-11eb-3fe2-3dea35e723d2
 # ╠═8e614b80-73e8-11eb-22d6-9fe17ad381e9
+# ╠═8b26f570-7774-11eb-1688-358a12996421
 # ╠═768f9410-719c-11eb-31a7-8f26a5a7ee90
 # ╠═1018c09c-6f14-11eb-0e0e-a5e9a11b79f1
 # ╠═69cdb220-72b4-11eb-11b2-af93cd66d67a
