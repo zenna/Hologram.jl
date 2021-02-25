@@ -105,7 +105,7 @@ onmove({layerX: 80, layerY: 80})
 
 # ╔═╡ dc30ac40-72b0-11eb-04cc-7d8f12718937
 begin
-	dims = draw_dims
+	dims = [40 70 10 20]#draw_dims
 	xdims = sort(dims[1:2]);
 	ydims = sort(dims[3:4]); 
 	dims[1] = xdims[1];
@@ -125,9 +125,14 @@ begin
 const canvas = currentScript.closest('pluto-output').querySelector("canvas")
 const ctx = canvas.getContext("2d")
 
+<<<<<<< HEAD
 var startX = 0
 var startY = 50
 	var old = []
+=======
+# ╔═╡ 69cdb220-72b4-11eb-11b2-af93cd66d67a
+#sort(draw_dims)
+>>>>>>> 19320f45a171fcdd29da1fbcadb52ad2b059095a
 
 function onmove(e){
 	// 🐸 We send the value back to Julia 🐸 //
